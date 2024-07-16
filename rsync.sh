@@ -5,13 +5,13 @@
 # 远程传输文件 rsync -av --progress --partial --append-verify -e "ssh -p $PORT" "$SOURCE" "$HOST:$DESTINATION"
 
 # 替换为你的密码
-PASSWORD='duo4aiKi'
+PASSWORD='xxxxx'
 
 # 替换为你的目标服务器和端口
-HOST='root@s1.v100.vip'
-PORT='23582'
-SOURCE='./chatbot/aibot_public_api.zip'
-DESTINATION='/mnt/data/zf/'
+HOST='xx@xxxxx'
+PORT='xxxx'
+SOURCE='xxxx'
+DESTINATION='xxxx'
 
 # 检查 rsync 是否安装
 if ! command -v rsync &> /dev/null
