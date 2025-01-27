@@ -14,7 +14,7 @@ show_help() {
 用法: $0 [选项]...
 选项:
   -p, --PASSWORD        远程主机密码 (如果已经配置了公钥验证，可省略)
-  -h, --HOST            远程主机地址 (必须指定)
+  -h, --HOST            远程主机地址 (必须指定；格式：username@ip)
   -P, --PORT            SSH端口 (默认: 22)
   -s, --SOURCE          源路径 (必须指定)
   -d, --DESTINATION     目标路径 (必须指定)
