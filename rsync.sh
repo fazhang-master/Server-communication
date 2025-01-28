@@ -7,6 +7,7 @@
 # 默认日志文件
 LOG_FILE="rsync.log"
 DEFAULT_PORT=22
+RETRY_INTERVAL=3 # 失败后重试的间隔时间（秒）
 
 # 帮助信息
 show_help() {
@@ -79,25 +80,30 @@ log_message "开始同步文件 (模式: $MODE)..."
 SSH_OPTIONS="-p $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 RSYNC_CMD="rsync -avz --progress --partial --append-verify -e \"ssh $SSH_OPTIONS\""
 
-if [[ $MODE == "upload" ]]; then
-  if [[ -z $PASSWORD ]]; then
-    eval "$RSYNC_CMD \"$SOURCE\" \"$HOST:$DESTINATION\""
+while true; do
+  if [[ $MODE == "upload" ]]; then
+    if [[ -z $PASSWORD ]]; then
+      eval "$RSYNC_CMD \"$SOURCE\" \"$HOST:$DESTINATION\""
+    else
+      sshpass -p "$PASSWORD" eval "$RSYNC_CMD \"$SOURCE\" \"$HOST:$DESTINATION\""
+    fi
+  elif [[ $MODE == "download" ]]; then
+    if [[ -z $PASSWORD ]]; then
+      eval "$RSYNC_CMD \"$HOST:$SOURCE\" \"$DESTINATION\""
+    else
+      sshpass -p "$PASSWORD" eval "$RSYNC_CMD \"$HOST:$SOURCE\" \"$DESTINATION\""
+    fi
   else
-    sshpass -p "$PASSWORD" eval "$RSYNC_CMD \"$SOURCE\" \"$HOST:$DESTINATION\""
+    log_message "错误: 未知模式 $MODE"
+    exit 1
   fi
-elif [[ $MODE == "download" ]]; then
-  if [[ -z $PASSWORD ]]; then
-    eval "$RSYNC_CMD \"$HOST:$SOURCE\" \"$DESTINATION\""
-  else
-    sshpass -p "$PASSWORD" eval "$RSYNC_CMD \"$HOST:$SOURCE\" \"$DESTINATION\""
-  fi
-else
-  log_message "错误: 未知模式 $MODE"
-  exit 1
-fi
 
-if [[ $? -eq 0 ]]; then
-  log_message "文件同步成功!"
-else
-  log_message "文件同步失败，请检查日志文件: $LOG_FILE"
-fi
+  # 检查返回状态码
+  if [[ $? -eq 0 ]]; then
+    log_message "文件同步成功!"
+    break
+  else
+    log_message "文件同步失败，5秒后重试..."
+    sleep $RETRY_INTERVAL
+  fi
+done
