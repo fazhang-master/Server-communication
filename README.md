@@ -118,7 +118,12 @@ rsync.sh 是一个基于 rsync 和 ssh 的文件同步脚本工具，支持从�
 - 下载：
 
   ```bash
-  ./rsync.sh -p "mypassword" -h "user@192.168.1.1" -P 22 -s "/remote/path" -d "/local/path" -l
+  ./rsync.sh -p "mypassword" -h "user@192.168.1.1" -P 22 -s "/remote/path" -d "/local/path" -l	
   ```
 
-  
+- 分块上传+带宽限制：
+
+  ```bash
+  ./rsync.sh -p "mypassword" -h "user@192.168.1.1" -P 22 -s "/remote/filepath" -d "/local/path" -l -b 5120 -c
+  ```
+
